@@ -1,5 +1,3 @@
-import math
- 
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
@@ -9,10 +7,10 @@ def f(a):
     return a +np.random.random()
  
  
-class UpdateDist(object):
-    def __init__(self,ax):
+class AnimaPlot(object):
+    def __init__(self,ax,data_lengh=200):
         self.data = 0
-
+        self.data_lengh = data_lengh
         self.line, = ax.plot([], [], '.-r')
         self.x = []
         self.y = []
@@ -20,38 +18,28 @@ class UpdateDist(object):
 
         self.ax = ax
 
-        # Set up plot parameters
+        
         self.ax.set_xlim(0, 21)
         self.ax.set_ylim(0, 21)
         self.ax.grid(True)
- 
-        # This vertical line represents the theoretical value, to
-        # which the plotted distribution should converge.
         # self.ax.axvline(prob, linestyle='--', color='black')
  
     def init(self):
-        # self.data = 0
+
         self.ax.axvline(self.data, linestyle=':', color='black')
         self.line.set_data([], [])
         return self.line,
  
     def __call__(self, i):
-        # This way the plot can continuously run and we just keep
-        # watching new realizations of the process
-        # print(i)
+
         if i == 0:
             return self.init()
  
-        # Choose data based on exceed a threshold with a uniform pick
-        
 
-
-        if len(self.x) >200:
+        if len(self.x) >self.data_lengh:
             del(self.x[0])
-        if len(self.y)> 200:
+        if len(self.y)> self.data_lengh:
             del(self.y[0])
-
-
 
         self.x.append(self.data)
         self.x_=self.data
@@ -63,15 +51,16 @@ class UpdateDist(object):
         self.ax.set_ylim(self.data-50, self.data)
         return self.line,
  
-# Fixing random state for reproducibility
+
 
  
  
 
 #frames
 fig, ax = plt.subplots()
-ud = UpdateDist(ax)
-anim = FuncAnimation(fig, ud, frames=100, init_func=ud.init,
+
+ap = AnimaPlot(ax)
+_ = FuncAnimation(fig, ap, frames=100, init_func=ap.init,
                      interval=100, blit=False)
 
 plt.show()
