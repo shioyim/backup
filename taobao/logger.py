@@ -79,7 +79,7 @@ loggers = dict(
 
 
 
-def check(courier):
+def check(courier,infomation=""):
 
     try:
         assert courier in loggers,"%s Not an available courier!"%courier
@@ -94,29 +94,70 @@ def check(courier):
                 if is_error:
                     return None
                 else:
-                    f = func(*args, **kw) 
-                    return f
+                    result = func(*args, **kw) 
+                    
             except Exception as e: 
-                loggers[courier](e)
+                if infomation:
+                    loggers[courier](infomation) 
+                else:
+                    loggers[courier](e)                    
+                result = None
+            return result
         return wrapper 
     return decorator
 
 
 
 
+async def run(func,courier="error",infomation="",**kw):       
+     try:
+        assert courier in loggers,"%s Not an available courier!"%courier
+        is_error = False
+     except AssertionError as e:
+        loggers["error"](e)
+        is_error = True
+
+     try:
+         if is_error:
+             return None
+         result = func(**kw) 
+     except Exception as e: 
+        if infomation:
+            loggers[courier](infomation) 
+        else:
+            loggers[courier](e)
+        result = None 
+     return result 
+ 
+ 
 
 
 
+#infomation 自定义消息 courier传信类型，就是所谓的debug、info、error 等等
+#除非你忽略了错误消息，否则一般不建议自定义消息，自定义消息意味着无论发生什么样的错误类型，消息都是自定义的。
+#exmple:
+#def f(x,y):
+#    return x/y
+#result = await run(f,x=1,y=0,courier="info") 
+#out#2019-06-13 21:23:22,756-INFO-division by zero
+#result = await run(f,x=1,y=0,courier="error",infomation="y can not use zore.") 
+#out# 2019-06-13 21:25:35,479-ERROR-y can not use zore.
 
 
 
-# from utils import logger    
-# @logger.check("info")
-# def test():
-#     logger.warning("print debug info")
-#     assert False,"Raise a AssertionError!"
-#     print("Test pass!")
+#@check("info") 
+#    def test(): 
+#        assert False,"Raise a AssertionError!"  
+
+#test()
+#out#2019-06-13 21:49:47,712-INFO-Raise a AssertionError!
 
 
-# if __name__ == '__main__':
-#     test()
+#test()
+#@check("info","custom infomation!") 
+#    def test(): 
+#        assert False,"Raise a AssertionError!" 
+#out#2019-06-13 21:50:56,175-INFO-custom infomation!
+
+
+

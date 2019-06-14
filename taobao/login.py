@@ -65,7 +65,7 @@ async def mouse_slide(page=None):
 async def click_wait_login(page):
     await asyncio.gather(page.waitForNavigation(), page.evaluate("document.getElementById('J_SubmitStatic').click()"))
     try:
-        await page.waitForSelector(".account-id", {"timeout": 15000})
+        await page.waitForSelector(".site-nav-login-info-nick", {"timeout": 15000})
         print(page.url)
         return await get_cookie(page)
     except:
@@ -120,7 +120,7 @@ async def login(page):
                 return
 
 async def main():
-    browser = await launch(headless=False, userDataDir="~/taobao-data", args=["--disable-infobars","--no-sandbox"])
+    browser = await launch(headless=False, userDataDir="user-data", args=["--disable-infobars","--no-sandbox"])
     context = await browser.createIncognitoBrowserContext()
     page = await context.newPage()
     await exe_js(page=page)
@@ -132,8 +132,11 @@ async def main():
     await page.type("#TPL_password_1",password, {"delay": wait_time()})
     await asyncio.sleep(random.random()+0.5)  
     await login(page=page)
+    input()
+    
+    
 
-
-asyncio.get_event_loop().run_until_complete(main())
+if __name__ == "__main__":
+    asyncio.get_event_loop().run_until_complete(main())
 
 
